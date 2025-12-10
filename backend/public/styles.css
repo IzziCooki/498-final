@@ -1,0 +1,322 @@
+/*==============================
+//  MAIN STYLESHEET
+//==============================*/
+
+/* VARIABLES */
+:root {
+    --primary-color: #6d28d9;
+    --primary-hover: #5b21b6;
+    --dark-bg: #111827;
+    --dark-card: #1f2937;
+    --dark-border: #374151;
+    --light-text: #f9fafb;
+    --medium-text: #9ca3af;
+    --success-color: #10b981;
+    --success-hover: #059669;
+}
+
+/* GLOBAL RESETS */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--dark-bg);
+    color: var(--light-text);
+    line-height: 1.7;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+img {
+    max-width: 100%;
+}
+
+/* LAYOUT */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.main-content {
+    padding: 2rem 0;
+}
+
+/* NAVBAR */
+.navbar {
+    background: var(--dark-card);
+    border-bottom: 1px solid var(--dark-border);
+    padding: 1.2rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem; /* Added padding for spacing from edges */
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--light-text);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links a {
+    color: var(--medium-text);
+    margin-left: 25px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--light-text);
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 5rem 1rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--medium-text);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+/* BUTTONS */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.6rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--light-text);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    color: var(--light-text);
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: var(--light-text);
+}
+
+.btn-success:hover {
+    background: var(--success-hover);
+    color: var(--light-text);
+}
+
+.btn-secondary {
+    background: var(--dark-border);
+    color: var(--light-text);
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    color: var(--light-text);
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* FORMS */
+.form-section {
+    max-width: 700px;
+    margin: 3rem auto;
+    background: var(--dark-card);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--dark-border);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--dark-bg);
+    border: 1px solid var(--dark-border);
+    border-radius: 8px;
+    color: var(--light-text);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.3);
+}
+
+.form-hint {
+    font-size: 0.9rem;
+    color: var(--medium-text);
+    margin-top: 0.5rem;
+}
+
+/* PDF LIST / GRID */
+.pdf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.pdf-card {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pdf-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.pdf-card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.pdf-card-body {
+    flex-grow: 1;
+    color: var(--medium-text);
+    margin-bottom: 1.5rem;
+}
+
+.pdf-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--medium-text);
+}
+
+.pdf-author {
+    font-style: italic;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid var(--dark-border);
+    color: var(--medium-text);
+}
+
+/* UTILITIES */
+.section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-2 {
+    margin-top: 2rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: center; /* Added for horizontal centering in column layout */
+    }
+
+    .nav-links {
+        margin-top: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-links a {
+        margin: 0 10px;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}

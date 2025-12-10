@@ -1,0 +1,25 @@
+<div class="container mt-5">
+    <h1>Add PDF</h1>
+    {{#if error}}
+        <div class="alert alert-danger">{{error}}</div>
+    {{/if}}
+    <form action="/addPdf" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="author" class="form-label">Author</label>
+            <input type="text" class="form-control" id="author" name="author">
+        </div>
+        <div class="mb-3">
+            <label for="pdfFile" class="form-label">PDF File</label>
+            <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept=".pdf" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add PDF</button>
+    </form>
+</div>

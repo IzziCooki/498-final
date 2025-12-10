@@ -1,0 +1,30 @@
+services:
+  # Node.js Express application
+  backend-pdf:
+    build: ./backend
+    container_name: backend-pdf
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PORT=1738
+    networks:
+      - app-network
+
+  # Nginx Proxy Manager
+  nginx-pdf:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-pdf
+    restart: unless-stopped
+    ports:
+      - '80:80'      # HTTP traffic
+      - '1739:443'    # HTTPS traffic
+      - '5001:81'
+      - '7777:7777'
+    volumes: # place to store all the data that we need persistant and external
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      - app-network
+
+networks:
+  app-network:
