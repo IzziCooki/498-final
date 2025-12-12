@@ -1,0 +1,59 @@
+<div class="container">
+    <h1 class="section-title">Real-Time Chat</h1>
+    <div class="chat-container">
+        <div id="messages" class="chat-messages"></div>
+        <form id="form" action="" class="chat-form">
+            <div class="input-group">
+                <input id="input" class="form-control" autocomplete="off" placeholder="Type a message..." />
+                <button class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const messages = document.getElementById('messages');
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (input.value) {
+            socket.emit('chat message', input.value);
+            input.value = '';
+        }
+    });
+
+    function appendMessage(msg) {
+        const item = document.createElement('div');
+        item.className = 'message-item';
+        item.innerHTML = `
+            <div class="message-header">
+                <span class="user-icon">${msg.profile_icon || '👤'}</span>
+                <strong class="user-name" style="color: ${msg.profile_color || '#6d28d9'}">
+                    ${msg.display_name}
+                </strong>
+                <small class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</small>
+            </div>
+            <div class="message-body">${msg.message}</div>
+        `;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    socket.on('chat message', function(msg) {
+        appendMessage(msg);
+    });
+
+    // Fetch chat history
+    fetch('/api/chat/history')
+        .then(response => response.json())
+        .then(history => {
+            history.forEach(msg => {
+                appendMessage(msg);
+            });
+        });
+</script>

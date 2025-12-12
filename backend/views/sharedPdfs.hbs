@@ -1,0 +1,29 @@
+<div class="container">
+    <h1 class="section-title">Shared PDFs</h1>
+    {{#if pdfs.length}}
+        <div class="pdf-grid">
+            {{#each pdfs}}
+                <div class="pdf-card">
+                    <div class="pdf-card-header">
+                        <h3>{{this.title}}</h3>
+                    </div>
+                    <div class="pdf-card-body">
+                        <p>{{this.description}}</p>
+                    </div>
+                    <div class="pdf-card-footer">
+                        <span class="pdf-author">By {{this.author}}</span>
+                        <div class="button-group">
+                            <a href="/pdfs/view/{{this.id}}" class="btn btn-secondary">Details</a>
+                            <a href="/pdfs/{{this.filename}}" class="btn btn-info" target="_blank">View</a>
+                            <a href="/pdfs/download/{{this.filename}}" class="btn btn-success">Download</a>
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state text-center">
+            <p>No shared PDFs found.</p>
+        </div>
+    {{/if}}
+</div>

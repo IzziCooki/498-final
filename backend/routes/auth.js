@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
 
     } catch (error) {
         console.error('Registration error:', error);
-        res.render('error', { message: 'An internal server error occurred. Please try again later.', back: '/auth/register' });
+        res.render('error', { message: 'An internal server error occurred. Please try again later.', back: '/register' });
     }
 });
 
@@ -68,11 +68,11 @@ router.post('/login', async (req, res) => {
         req.session.username = user.username;
         req.session.isLoggedIn = true;
 
-        res.redirect('/home');
+        res.redirect('/');
 
     } catch (error) {
         console.error('Login error:', error);
-        res.render('error', { message: 'An internal server error occurred. Please try again later.', back: '/auth/login' });
+        res.render('error', { message: 'An internal server error occurred. Please try again later.', back: '/login' });
     }
 });
 
@@ -98,7 +98,7 @@ router.post('/logout', (req, res) => {
 
 router.get('/me', (req, res) => {
     if (!req.session || !req.session.userId) {
-        return res.render('error', { message: 'You must be logged in to view this page.', back: '/auth/login' });
+        return res.render('error', { message: 'You must be logged in to view this page.', back: '/login' });
     }
 
     const user = db.prepare('SELECT id, username, created_at, last_login FROM users WHERE id = ?').get(req.session.userId);

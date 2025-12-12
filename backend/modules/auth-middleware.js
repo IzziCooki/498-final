@@ -6,23 +6,30 @@
  */
 function requireAuth(req, res, next) {
     if (req.session && req.session.userId) {
-        next();
-    } else {
-        res.status(401).send(`
-      <!DOCTYPE html>
-      <html>
-      <head><title>Authentication Required</title></head>
-      <body>
-        <h1>Authentication Required</h1>
-        <p>You must be logged in to access this page.</p>
-        <p><a href="/api/auth/login">Login here</a></p>
-        <p><a href="/">← Back to Home</a></p>
-      </body>
-      </html>
-    `);
+        return next();
     }
+    res.status(401).render('unauthorized');
+}
+
+function isPdfOwner(req, res, next) {
+    const db = require('../database');
+    const pdfId = req.params.id;
+    const userId = req.session.userId;
+
+    const pdf = db.prepare('SELECT * FROM pdfs WHERE id = ?').get(pdfId);
+
+    if (!pdf) {
+        return res.status(404).render('error', { message: 'PDF not found.' });
+    }
+
+    if (pdf.user_id !== userId) {
+        return res.status(403).render('forbidden');
+    }
+
+    next();
 }
 
 module.exports = {
-    requireAuth
+    requireAuth,
+    isPdfOwner
 };

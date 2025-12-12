@@ -1,0 +1,107 @@
+<div class="container">
+    <div class="pdf-detail-card">
+        <h1 class="section-title">{{pdf.title}}</h1>
+        <div class="pdf-meta">
+            <p><strong>Author:</strong> {{pdf.author}}</p>
+            <p><strong>Description:</strong> {{pdf.description}}</p>
+            <p>
+                <strong>Visibility:</strong> 
+                {{#if pdf.is_public}}
+                    <span class="badge badge-success">Public (Shared)</span>
+                {{else}}
+                    <span class="badge badge-secondary">Private</span>
+                {{/if}}
+            </p>
+        </div>
+        <div class="pdf-actions">
+            <a href="/pdfs/{{pdf.filename}}" class="btn btn-primary" target="_blank">View PDF</a>
+            <a href="/pdfs/download/{{pdf.filename}}" class="btn btn-success">Download</a>
+            
+            {{#if isPdfOwner}}
+                <form action="/pdfs/toggle-share/{{pdf.id}}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-info">
+                        {{#if pdf.is_public}}Make Private{{else}}Make Public{{/if}}
+                    </button>
+                </form>
+            {{/if}}
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <h2 class="section-subtitle">Comments</h2>
+
+    <form action="/pdfs/comment/{{pdf.id}}" method="POST" class="comment-form">
+        <div class="form-group">
+            <label for="comment_text">Add a comment (Markdown supported)</label>
+            <textarea id="comment_text" name="comment_text" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <div id="comments-container">
+        {{#each comments}}
+        <div class="comment-card" id="comment-{{this.id}}">
+            <div class="comment-header">
+                <div class="user-info">
+                    <span class="user-icon">{{this.profile_icon}}</span>
+                    <strong class="user-name">{{this.display_name}}</strong>
+                    <span class="comment-date">{{this.created_at}}</span>
+                </div>
+                {{#if this.isOwner}}
+                <div class="comment-actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showEditForm({{this.id}})">Edit</button>
+                    <form action="/pdfs/comment/delete/{{this.id}}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </div>
+                {{/if}}
+            </div>
+            <div class="comment-body">
+                {{{this.comment_text}}}
+            </div>
+            
+            {{#if this.isOwner}}
+            <div id="edit-form-{{this.id}}" class="edit-form" style="display: none;">
+                <form action="/pdfs/comment/edit/{{this.id}}" method="POST">
+                    <textarea class="form-control" name="comment_text" rows="3">{{this.comment_text}}</textarea>
+                    <div class="edit-actions">
+                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="hideEditForm({{this.id}})">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+<script>
+function showEditForm(id) {
+    document.getElementById('edit-form-' + id).style.display = 'block';
+}
+function hideEditForm(id) {
+    document.getElementById('edit-form-' + id).style.display = 'none';
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const commentTexts = document.querySelectorAll('.comment-text');
+        commentTexts.forEach(el => {
+            const rawMarkdown = el.textContent;
+            el.innerHTML = DOMPurify.sanitize(marked.parse(rawMarkdown));
+        });
+    });
+
+    function showEditForm(commentId) {
+        document.getElementById(`edit-form-${commentId}`).style.display = 'block';
+    }
+
+    function hideEditForm(commentId) {
+        document.getElementById(`edit-form-${commentId}`).style.display = 'none';
+    }
+</script>

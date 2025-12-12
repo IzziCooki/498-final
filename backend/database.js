@@ -28,6 +28,42 @@ db.exec(`
     title TEXT,
     description TEXT,
     author TEXT,
+    is_public INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+  )
+`);
+
+// Migration to add is_public if it doesn't exist (for existing databases)
+try {
+  const columns = db.pragma('table_info(pdfs)');
+  const hasIsPublic = columns.some(col => col.name === 'is_public');
+  if (!hasIsPublic) {
+    db.exec('ALTER TABLE pdfs ADD COLUMN is_public INTEGER DEFAULT 0');
+  }
+} catch (err) {
+  console.error('Error migrating pdfs table:', err);
+}
+
+// Create comments table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pdf_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    comment_text TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pdf_id) REFERENCES pdfs (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+  )
+`);
+
+// Create messages table for chat
+db.exec(`
+  CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)
   )

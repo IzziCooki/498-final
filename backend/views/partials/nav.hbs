@@ -1,11 +1,20 @@
 <header class="navbar">
     <div class="nav-container container">
-        <a href="/" class="logo">{{siteTitle}}</a>
+        <a href="/" class="logo">PDF Manager</a>
 
         <nav class="nav-links">
             <a href="/">Home</a>
-            <a href="/pdf">Library</a>
-            <a href="/add-pdf">Add PDF</a>
+            <a href="/pdfs">Library</a>
+            <a href="/pdfs/shared">Shared PDFs</a>
+            <a href="/pdfs/add">Add PDF</a>
+            <a href="/chat">Chat</a>
+            {{#if user}}
+                 <a href="/logout">Logout</a>
+            {{else}}
+                 <a href="/login">Login</a>
+                 <a href="/register">Register</a>
+            {{/if}}
+
         </nav>
     </div>
 </header>

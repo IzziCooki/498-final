@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     ports:
       - '80:80'      # HTTP traffic
-      - '1739:443'    # HTTPS traffic
+      - '443:443'    # HTTPS traffic
       - '5001:81'  
     volumes: # place to store all the data that we need persistant and external
       - ./nginx/data:/data
