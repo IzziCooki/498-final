@@ -96,7 +96,7 @@ router.post('/logout', (req, res) => {
     });
 });
 
-router.get('/me', (req, res) => {
+router.get('/profile', (req, res) => {
     if (!req.session || !req.session.userId) {
         return res.render('error', { message: 'You must be logged in to view this page.', back: '/login' });
     }
