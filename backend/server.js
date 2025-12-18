@@ -42,7 +42,7 @@ app.use(sessionMiddleware);
 // Make user available to all views
 app.use((req, res, next) => {
     if (req.session.userId) {
-        const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(req.session.userId);
+        const user = db.prepare('SELECT id, username, display_name FROM users WHERE id = ?').get(req.session.userId);
         res.locals.user = user;
     } else {
         res.locals.user = null;
@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
     const userId = socket.request.session.userId;
     
     // Get user info
-    const user = db.prepare('SELECT username FROM users WHERE id = ?').get(userId);
+    const user = db.prepare('SELECT username, display_name FROM users WHERE id = ?').get(userId);
 
     socket.on('chat message', (msg) => {
         if (!msg) return;
@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
         // Broadcast to all clients
         io.emit('chat message', {
             message: msg,
-            display_name: user.username,
+            display_name: user.display_name,
             created_at: new Date(),
             profile_color: '#6d28d9', // Default color
             profile_icon: '👤'
@@ -111,12 +111,12 @@ app.get('/', requireAuth, (req, res) => {
 });
 
 app.get('/chat', requireAuth, (req, res) => {
-    res.render('chat');
+    res.render('chat'); 
 });
 
 app.get('/api/chat/history', requireAuth, (req, res) => {
     const messages = db.prepare(`
-        SELECT m.message, m.created_at, u.username as display_name 
+        SELECT m.message, m.created_at, u.display_name as display_name, u.color as profile_color
         FROM messages m 
         JOIN users u ON m.user_id = u.id 
         ORDER BY m.created_at ASC
@@ -125,7 +125,7 @@ app.get('/api/chat/history', requireAuth, (req, res) => {
     // Format for frontend
     const formatted = messages.map(m => ({
         ...m,
-        profile_color: '#6d28d9',
+        profile_color: m.profile_color || '#6d28d9',
         profile_icon: '👤'
     }));
     

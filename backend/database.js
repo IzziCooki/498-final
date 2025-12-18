@@ -12,6 +12,9 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
+    display_name TEXT,
+    color TEXT DEFAULT "#6d28d9",
+    email TEXT,
     password_hash TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME
@@ -41,8 +44,19 @@ try {
   if (!hasIsPublic) {
     db.exec('ALTER TABLE pdfs ADD COLUMN is_public INTEGER DEFAULT 0');
   }
+  const users_column = db.pragma('table_info(users)');
+  const hasEmailOrDisplayname = users_column.some(col => col.name === 'email' || 'display_name' );
+  if (!hasEmailOrDisplayname){
+    db.exec('ALTER TABLE users ADD COLUMN email TEXT');
+    db.exec('ALTER TABLE users ADD COLUMN display_name TEXT');
+  }
+
+  const hasColor = users_column.some(col => col.name === 'color');
+  if (!hasColor){
+    db.exec('ALTER TABLE users ADD COLUMN color TEXT DEFAULT "#6d28d9"');
+  }
 } catch (err) {
-  console.error('Error migrating pdfs table:', err);
+  console.error('Error migrating pdfs table and users_column:', err);
 }
 
 // Create comments table

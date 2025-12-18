@@ -512,3 +512,29 @@ img {
         text-align: center;
     }
 }
+
+/* ALERTS */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #155724; /* Dark green background */
+    color: #d4edda; /* Light green text */
+    border: 1px solid #28a745; /* Green border */
+}
+
+.alert-danger {
+    background-color: #721c24; /* Dark red background */
+    color: #f8d7da; /* Light red text */
+    border: 1px solid #dc3545; /* Red border */
+}
+
+.alert-warning {
+    background-color: #856404; /* Dark yellow background */
+    color: #fff3cd; /* Light yellow text */
+    border: 1px solid #ffc107; /* Yellow border */
+}

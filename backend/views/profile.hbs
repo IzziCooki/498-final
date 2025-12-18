@@ -1,24 +1,53 @@
 <div class="container mt-5">
     <h1>User Profile</h1>
-    <table class="table">
-        <tbody>
-            <tr>
-                <th scope="row">User ID</th>
-                <td>{{id}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Username</th>
-                <td>{{username}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Created At</th>
-                <td>{{created_at}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Last Login</th>
-                <td>{{last_login}}</td>
-            </tr>
-        </tbody>
-    </table>
-    <a href="/home" class="btn btn-primary">Back to Home</a>
+
+    {{#if success}}
+        <div class="alert alert-success" role="alert">
+            {{success}}
+        </div>
+    {{/if}}
+    {{#if error}}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+    {{/if}}
+
+    <div class="form-section">
+        <form action="/profile" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="{{username}}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="display_name">Display Name</label>
+                <input type="text" id="display_name" name="display_name" value="{{display_name}}">
+            </div>
+            <div class="form-group">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color" value="{{color}}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{email}}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+
+    <h2 class="mt-5">Account Details</h2>
+    <div class="form-section">
+        <div class="form-group">
+            <label>User ID</label>
+            <p>{{id}}</p>
+        </div>
+        <div class="form-group">
+            <label>Created At</label>
+            <p>{{created_at}}</p>
+        </div>
+        <div class="form-group">
+            <label>Last Login</label>
+            <p>{{last_login}}</p>
+        </div>
+    </div>
+    <a href="/" class="btn btn-secondary mt-2">Back to Home</a>
 </div>

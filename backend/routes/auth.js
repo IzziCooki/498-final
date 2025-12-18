@@ -101,18 +101,44 @@ router.get('/profile', (req, res) => {
         return res.render('error', { message: 'You must be logged in to view this page.', back: '/login' });
     }
 
-    const user = db.prepare('SELECT id, username, created_at, last_login FROM users WHERE id = ?').get(req.session.userId);
+    const user = db.prepare('SELECT id, username, display_name, color, email, created_at, last_login FROM users WHERE id = ?').get(req.session.userId);
 
     if (!user) {
         return res.render('error', { message: 'User not found in database.', back: '/' });
     }
 
+    const successMessage = req.query.success;
+    const errorMessage = req.query.error;
+
     res.render('profile', {
         id: user.id,
         username: user.username,
+        display_name: user.display_name || '',
+        color: user.color || '#6d28d9',
+        email: user.email || '',
         created_at: user.created_at || 'N/A',
-        last_login: user.last_login || 'Never'
+        last_login: user.last_login || 'Never',
+        success: successMessage,
+        error: errorMessage
     });
+});
+
+router.post('/profile', (req, res) => {
+    if (!req.session || !req.session.userId) {
+        return res.render('error', { message: 'You must be logged in to update your profile.', back: '/login' });
+    }
+
+    const { display_name, email, color } = req.body;
+    const userId = req.session.userId;
+
+    try {
+        const stmt = db.prepare('UPDATE users SET display_name = ?, email = ?, color = ? WHERE id = ?');
+        stmt.run(display_name, email, color, userId);
+        res.redirect('/profile?success=Profile updated successfully!');
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.redirect('/profile?error=Failed to update profile.');
+    }
 });
 
 module.exports = router;
