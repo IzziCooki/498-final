@@ -7,6 +7,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=1738
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
     # Override the default CMD to use nodemon instead of node
     command: npx nodemon server.js
     # Mount volumes for hot-reloading during development

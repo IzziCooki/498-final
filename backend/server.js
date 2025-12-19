@@ -42,7 +42,7 @@ app.use(sessionMiddleware);
 // Make user available to all views
 app.use((req, res, next) => {
     if (req.session.userId) {
-        const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(req.session.userId);
+        const user = db.prepare('SELECT id, username, display_name, color FROM users WHERE id = ?').get(req.session.userId);
         res.locals.user = user;
     } else {
         res.locals.user = null;

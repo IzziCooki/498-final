@@ -16,6 +16,8 @@ db.exec(`
     color TEXT DEFAULT "#6d28d9",
     display_icon TEXT DEFAULT "👤",
     email TEXT,
+    reset_password_token TEXT,
+    reset_password_expires DATETIME,
     password_hash TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME
@@ -55,6 +57,12 @@ try {
   const hasColor = users_column.some(col => col.name === 'color');
   if (!hasColor){
     db.exec('ALTER TABLE users ADD COLUMN color TEXT DEFAULT "#6d28d9"');
+  }
+
+  const hasResetToken = users_column.some(col => col.name === 'reset_password_token');
+  if (!hasResetToken) {
+    db.exec('ALTER TABLE users ADD COLUMN reset_password_token TEXT');
+    db.exec('ALTER TABLE users ADD COLUMN reset_password_expires DATETIME');
   }
 } catch (err) {
   console.error('Error migrating pdfs table and users_column:', err);

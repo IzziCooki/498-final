@@ -1,5 +1,7 @@
 // backend/modules/email-utils.js
 const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // TODO: Configure this with your email service provider's details
 // For Gmail, you may need to use an "App Password" if you have 2-Step Verification enabled.
@@ -14,10 +16,10 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendPasswordResetEmail(to, token) {
-    const resetLink = `http://localhost:1739/auth/reset-password/${token}`;
+        const resetLink = `http://deanhauser.me/reset-password/${token}`;
     const mailOptions = {
-        from: `"Your App Name" <${process.env.EMAIL_USER}>`,
-        to: to,
+        from: `"COS498 Final" <${process.env.EMAIL_USER}>`,
+        to: to, 
         subject: 'Password Reset Request',
         html: `
             <p>You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p>

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const db = require('../database');
 const { validatePassword, hashPassword, comparePassword } = require('../modules/password-utils');
+const { sendPasswordResetEmail } = require('../modules/email-utils');
 
 router.get('/register', (req, res) => {
     res.render('register');
@@ -138,6 +140,84 @@ router.post('/profile', (req, res) => {
     } catch (error) {
         console.error('Profile update error:', error);
         res.redirect('/profile?error=Failed to update profile.');
+    }
+});
+
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password');
+});
+
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    
+    try {
+        const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+        
+        if (!user) {
+            // Don't reveal that the user doesn't exist
+            return res.render('forgot-password', { success: 'If an account with that email exists, a password reset link has been sent.' });
+        }
+
+        const token = crypto.randomBytes(20).toString('hex');
+        const expires = Date.now() + 3600000; // 1 hour
+
+        db.prepare('UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE id = ?')
+            .run(token, expires, user.id);
+
+        await sendPasswordResetEmail(email, token);
+
+        res.render('forgot-password', { success: 'If an account with that email exists, a password reset link has been sent.' });
+
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.render('forgot-password', { error: 'An error occurred. Please try again.' });
+    }
+});
+
+router.get('/reset-password/:token', (req, res) => {
+    const { token } = req.params;
+    
+    const user = db.prepare('SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?')
+        .get(token, Date.now());
+
+    if (!user) {
+        return res.render('error', { message: 'Password reset token is invalid or has expired.', back: '/forgot-password' });
+    }
+
+    res.render('reset-password', { token });
+});
+
+router.post('/reset-password/:token', async (req, res) => {
+    const { token } = req.params;
+    const { password, confirm_password } = req.body;
+
+    if (password !== confirm_password) {
+        return res.render('reset-password', { token, error: 'Passwords do not match.' });
+    }
+
+    const validation = validatePassword(password);
+    if (!validation.valid) {
+        return res.render('reset-password', { token, error: 'Password does not meet requirements: ' + validation.errors.join(', ') });
+    }
+
+    try {
+        const user = db.prepare('SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expires > ?')
+            .get(token, Date.now());
+
+        if (!user) {
+            return res.render('error', { message: 'Password reset token is invalid or has expired.', back: '/forgot-password' });
+        }
+
+        const passwordHash = await hashPassword(password);
+
+        db.prepare('UPDATE users SET password_hash = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE id = ?')
+            .run(passwordHash, user.id);
+
+        res.render('login', { success: 'Password has been reset successfully. Please login.' });
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.render('reset-password', { token, error: 'An error occurred. Please try again.' });
     }
 });
 

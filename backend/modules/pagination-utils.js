@@ -1,7 +1,9 @@
 // Universal pagination helper
+// https://medium.com/@atacanymc/implementing-pagination-in-an-express-js-application-551244b62d48
+// https://www.geeksforgeeks.org/javascript/how-to-paginate-an-array-in-javascript/#
 function getPagination(page, limit, totalItems) {
-    const currentPage = Math.max(1, parseInt(page) || 1);
-    const itemsPerPage = Math.max(1, parseInt(limit) || 10);
+    const currentPage = parseInt(page) || 1;
+    const itemsPerPage = parseInt(limit) || 10;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const offset = (currentPage - 1) * itemsPerPage;
 
