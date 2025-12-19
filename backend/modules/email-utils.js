@@ -3,15 +3,14 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// TODO: Configure this with your email service provider's details
-// For Gmail, you may need to use an "App Password" if you have 2-Step Verification enabled.
+// Create a transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: process.env.EMAIL_USER, // Your Gmail address from .env file
-        pass: process.env.EMAIL_PASS, // Your Gmail password or App Password from .env file
+        user: process.env.EMAIL_USER, //  Gmail address from .env file
+        pass: process.env.EMAIL_PASS, //  Gmail App Password from .env file
     },
 });
 
@@ -31,6 +30,7 @@ async function sendPasswordResetEmail(to, token) {
     };
 
     try {
+        // Send the email
         await transporter.sendMail(mailOptions);
         console.log('Password reset email sent to:', to);
     } catch (error) {

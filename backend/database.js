@@ -42,34 +42,6 @@ db.exec(`
   )
 `);
 
-// Migration to add is_public if it doesn't exist (for existing databases)
-try {
-  const columns = db.pragma('table_info(pdfs)');
-  const hasIsPublic = columns.some(col => col.name === 'is_public');
-  if (!hasIsPublic) {
-    db.exec('ALTER TABLE pdfs ADD COLUMN is_public INTEGER DEFAULT 0');
-  }
-  const users_column = db.pragma('table_info(users)');
-  const hasEmailOrDisplayname = users_column.some(col => col.name === 'email' || 'display_name' );
-  if (!hasEmailOrDisplayname){
-    db.exec('ALTER TABLE users ADD COLUMN email TEXT');
-    db.exec('ALTER TABLE users ADD COLUMN display_name TEXT');
-  }
-
-  const hasColor = users_column.some(col => col.name === 'color');
-  if (!hasColor){
-    db.exec('ALTER TABLE users ADD COLUMN color TEXT DEFAULT "#6d28d9"');
-  }
-
-  const hasResetToken = users_column.some(col => col.name === 'reset_password_token');
-  if (!hasResetToken) {
-    db.exec('ALTER TABLE users ADD COLUMN reset_password_token TEXT');
-    db.exec('ALTER TABLE users ADD COLUMN reset_password_expires DATETIME');
-  }
-} catch (err) {
-  console.error('Error migrating pdfs table and users_column:', err);
-}
-
 // Create comments table
 db.exec(`
   CREATE TABLE IF NOT EXISTS comments (

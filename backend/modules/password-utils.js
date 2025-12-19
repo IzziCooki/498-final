@@ -2,18 +2,14 @@
 const argon2 = require('argon2');
 
 // Argon2 configuration options
-// These values provide a good balance of security and performance
 const ARGON2_OPTIONS = {
-    type: argon2.argon2id,  // Uses a hybrid approach (best for most cases)
+    type: argon2.argon2id,  // hybrid approach
     memoryCost: 65536,      // 64 MB memory cost
     timeCost: 3,            // Number of iterations
     parallelism: 4          // Number of parallel threads
 };
 
-/*
-validatePassword takes a password and checks to see if
-it passes some standard requirements (like length, an uppercase, etc)
-*/
+// Validates a password against defined security criteria
 function validatePassword(password) {
     const errors = [];
 
@@ -48,14 +44,13 @@ function validatePassword(password) {
     };
 }
 
-// simple function that will hash a password.
+// hash a password.
 async function hashPassword(password) {
     return await argon2.hash(password, ARGON2_OPTIONS);
 }
 
 
 // Compares a plain text password with a hashed password
-
 async function comparePassword(password, hash) {
     return await argon2.verify(hash, password);
 }

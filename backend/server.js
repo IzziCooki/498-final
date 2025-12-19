@@ -1,15 +1,17 @@
-const express = require('express');
-const session = require('express-session');
-const exphbs = require('express-handlebars');
-const path = require('path');
-const http = require('http');
-const { Server } = require('socket.io');
-const db = require('./database');
+// Core dependencies
+const express = require('express'); 
+const session = require('express-session'); // Session middleware for authentication state
+const exphbs = require('express-handlebars'); // Templating engine for rendering views
+const path = require('path'); // Utility for handling file paths
+const http = require('http'); // Node.js HTTP server (needed for Socket.io)
+const { Server } = require('socket.io'); // Real-time communication library
+const db = require('./database'); // Database connection module
 
 const authRoutes = require('./routes/auth');
 const pdfRoutes = require('./routes/pdf');
 const { requireAuth } = require('./modules/auth-middleware');
 const SQLiteStore = require('./sqlite-session-store');
+const { title } = require('process');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,26 +19,33 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+
+
+// Parse incoming JSON payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Serve static files (CSS, images, JS) from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session configuration
+
+// Session Configuration
+// Configures how user sessions are stored and managed
 const sessionMiddleware = session({
+    // Use SQLite store to persist sessions across server restarts
     store: new SQLiteStore({
         db: path.join(__dirname, 'sessions.db'),
         table: 'sessions'
     }),
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'your-secret-key', // Secret used to sign the session ID cookie
+    resave: false, // Don't save session if unmodified
+    saveUninitialized: false, // Don't create session until something is stored
     cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: false, // Set to true if using HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000 // Cookie expiration: 24 hours
     }
 });
 
+// Apply session middleware to the app
 app.use(sessionMiddleware);
 
 // Make user available to all views
@@ -82,7 +91,7 @@ io.on('connection', (socket) => {
             message: msg,
             display_name: user.display_name,
             created_at: new Date(),
-            profile_color: '#6d28d9', // Default color
+            profile_color: user.color, // Default color
             profile_icon: '👤'
         });
     });
@@ -111,10 +120,11 @@ app.get('/', requireAuth, (req, res) => {
 });
 
 app.get('/chat', requireAuth, (req, res) => {
-    res.render('chat'); 
+    res.render('chat', { title: 'Chat Room' }); 
 });
 
 app.get('/api/chat/history', requireAuth, (req, res) => {
+    // Fetch chat history from DB
     const messages = db.prepare(`
         SELECT m.message, m.created_at, u.display_name as display_name, u.color as profile_color
         FROM messages m 

@@ -18,6 +18,7 @@ function getPagination(page, limit, totalItems) {
         nextPage: currentPage + 1,
         showPagination: totalPages > 1,
         // Generate array of page numbers for rendering
+        // Each page object contains the page number and whether it's the active page
         pages: Array.from({ length: totalPages }, (_, i) => ({
             number: i + 1,
             active: i + 1 === currentPage

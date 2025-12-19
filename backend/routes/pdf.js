@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+// File upload handling
 const multer = require('multer');
+// Markdown parsing
 const { marked } = require('marked');
 const db = require('../database');
 const { requireAuth } = require('../modules/auth-middleware');
@@ -38,11 +40,13 @@ router.get('/add', requireAuth, (req, res) => {
 });
 
 // Handle Add PDF
+// upload.single middleware processes the uploaded file
 router.post('/add', requireAuth, upload.single('pdfFile'), (req, res) => {
     try {
         const { filename, path: filePath } = req.file;
         const { title, description, author, is_public } = req.body;
         const userId = req.session.userId;
+        // is_public checkbox 
         const isPublicValue = is_public ? 1 : 0;
 
         const stmt = db.prepare('INSERT INTO pdfs (user_id, filename, filepath, title, description, author, is_public) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -58,14 +62,16 @@ router.post('/add', requireAuth, upload.single('pdfFile'), (req, res) => {
 // Shared PDFs
 router.get('/shared', requireAuth, (req, res) => {
     try {
+        // Pagination setup
         const page = req.query.page || 1;
+        // 6 items per page for grid view
         const limit = 6;
 
         const countStmt = db.prepare('SELECT COUNT(*) as count FROM pdfs WHERE is_public = 1');
         const totalItems = countStmt.get().count;
-
+        // Get pagination details
         const pagination = getPagination(page, limit, totalItems);
-
+        // Fetch only paginated public PDFs
         const pdfs = db.prepare('SELECT * FROM pdfs WHERE is_public = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?')
             .all(pagination.itemsPerPage, pagination.offset);
 
@@ -100,6 +106,7 @@ router.get('/view/:id', requireAuth, (req, res) => {
         const pagination = getPagination(page, limit, totalItems);
 
         // Fetch comments with vote count and user's vote
+        // 
         const comments = db.prepare(`
             SELECT c.*, u.display_name as display_name,
             (SELECT COALESCE(SUM(vote_value), 0) FROM comment_votes WHERE comment_id = c.id) as vote_count,
