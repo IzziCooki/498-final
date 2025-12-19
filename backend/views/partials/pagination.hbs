@@ -1,0 +1,33 @@
+{{#if pagination.totalPages}}
+    {{#if pagination.showPagination}}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center" style="display: flex; list-style: none; gap: 5px;">
+                {{#if pagination.hasPrevious}}
+                    <li class="page-item">
+                        <a class="page-link btn btn-secondary" href="?page={{pagination.previousPage}}">Previous</a>
+                    </li>
+                {{else}}
+                    <li class="page-item disabled">
+                        <span class="page-link btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Previous</span>
+                    </li>
+                {{/if}}
+
+                {{#each pagination.pages}}
+                    <li class="page-item">
+                        <a class="page-link btn {{#if this.active}}btn-primary{{else}}btn-secondary{{/if}}" href="?page={{this.number}}">{{this.number}}</a>
+                    </li>
+                {{/each}}
+
+                {{#if pagination.hasNext}}
+                    <li class="page-item">
+                        <a class="page-link btn btn-secondary" href="?page={{pagination.nextPage}}">Next</a>
+                    </li>
+                {{else}}
+                    <li class="page-item disabled">
+                        <span class="page-link btn btn-secondary" style="opacity: 0.5; cursor: not-allowed;">Next</span>
+                    </li>
+                {{/if}}
+            </ul>
+        </nav>
+    {{/if}}
+{{/if}}

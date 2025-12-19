@@ -46,7 +46,12 @@
                 <div class="user-info">
                     <span class="user-icon">{{this.profile_icon}}</span>
                     <strong class="user-name">{{this.display_name}}</strong>
-                    <span class="comment-date">{{this.created_at}}</span>
+                    <span class="comment-date">
+                        {{this.created_at}}
+                        {{#if this.is_edited}}
+                            <span style="font-size: 0.8em; color: #9ca3af; font-style: italic; margin-left: 5px;">(edited at {{this.updated_at}})</span>
+                        {{/if}}
+                    </span>
                 </div>
                 {{#if this.isOwner}}
                 <div class="comment-actions">
@@ -72,9 +77,22 @@
                 </form>
             </div>
             {{/if}}
+            
+            <div class="vote-actions">
+                <form action="/pdfs/comment/vote/{{this.id}}/up" method="POST" class="vote-form">
+                    <button type="submit" class="btn-vote btn-upvote {{#if this.isUpvoted}}active{{/if}}" title="Upvote">▲</button>
+                </form>
+                <span class="vote-count">{{#if this.vote_count}}{{this.vote_count}}{{else}}0{{/if}}</span>
+                <form action="/pdfs/comment/vote/{{this.id}}/down" method="POST" class="vote-form">
+                    <button type="submit" class="btn-vote btn-downvote {{#if this.isDownvoted}}active{{/if}}" title="Downvote">▼</button>
+                </form>
+            </div>
+
         </div>
         {{/each}}
     </div>
+    
+    {{> pagination}}
 </div>
 
 <script>

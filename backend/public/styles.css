@@ -448,6 +448,60 @@ img {
     gap: 0.5rem;
 }
 
+/* VOTING */
+.vote-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.vote-form {
+    display: inline;
+}
+
+.btn-vote {
+    background: none;
+    border: 1px solid var(--dark-border);
+    color: var(--medium-text);
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-vote:hover {
+    background: var(--dark-border);
+    color: var(--light-text);
+}
+
+.btn-upvote:hover,
+.btn-upvote.active {
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-upvote.active {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.btn-downvote:hover,
+.btn-downvote.active {
+    color: #ef4444; /* Red */
+    border-color: #ef4444;
+}
+
+.btn-downvote.active {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.vote-count {
+    font-weight: bold;
+    color: var(--light-text);
+    min-width: 1.5rem;
+    text-align: center;
+}
+
 /* BADGES */
 .badge {
     display: inline-block;

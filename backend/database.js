@@ -14,6 +14,7 @@ db.exec(`
     username TEXT UNIQUE NOT NULL,
     display_name TEXT,
     color TEXT DEFAULT "#6d28d9",
+    display_icon TEXT DEFAULT "👤",
     email TEXT,
     password_hash TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -66,6 +67,10 @@ db.exec(`
     pdf_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     comment_text TEXT NOT NULL,
+    is_edited INTEGER DEFAULT 0,
+    upvotes INTEGER DEFAULT 0,
+    downvotes INTEGER DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pdf_id) REFERENCES pdfs (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
@@ -80,6 +85,20 @@ db.exec(`
     message TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)
+  )
+`);
+
+// Create comment_votes table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS comment_votes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    comment_id INTEGER NOT NULL,
+    vote_value INTEGER NOT NULL, -- 1 for up, -1 for down
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (comment_id) REFERENCES comments (id),
+    UNIQUE(user_id, comment_id)
   )
 `);
 

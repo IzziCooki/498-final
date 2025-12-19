@@ -6,6 +6,7 @@ const { marked } = require('marked');
 const db = require('../database');
 const { requireAuth } = require('../modules/auth-middleware');
 const { isPdfOwner } = require('../modules/auth-middleware');
+const { getPagination } = require('../modules/pagination-utils');
 
 const pdfFolder = path.join(__dirname, '..', 'pdfs');
 
@@ -57,8 +58,18 @@ router.post('/add', requireAuth, upload.single('pdfFile'), (req, res) => {
 // Shared PDFs
 router.get('/shared', requireAuth, (req, res) => {
     try {
-        const pdfs = db.prepare('SELECT * FROM pdfs WHERE is_public = 1 ORDER BY created_at DESC').all();
-        res.render('sharedPdfs', { pdfs });
+        const page = req.query.page || 1;
+        const limit = 6;
+
+        const countStmt = db.prepare('SELECT COUNT(*) as count FROM pdfs WHERE is_public = 1');
+        const totalItems = countStmt.get().count;
+
+        const pagination = getPagination(page, limit, totalItems);
+
+        const pdfs = db.prepare('SELECT * FROM pdfs WHERE is_public = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?')
+            .all(pagination.itemsPerPage, pagination.offset);
+
+        res.render('sharedPdfs', { pdfs, pagination });
     } catch (error) {
         console.error('Error fetching shared PDFs:', error);
         res.render('error', { message: 'Error fetching shared PDFs.' });
@@ -80,29 +91,42 @@ router.get('/view/:id', requireAuth, (req, res) => {
             return res.status(403).render('forbidden');
         }
 
-        // Fetch comments
+        const page = req.query.page || 1;
+        const limit = 5; // 5 comments per page
+
+        const countStmt = db.prepare('SELECT COUNT(*) as count FROM comments WHERE pdf_id = ?');
+        const totalItems = countStmt.get(pdfId).count;
+
+        const pagination = getPagination(page, limit, totalItems);
+
+        // Fetch comments with vote count and user's vote
         const comments = db.prepare(`
-            SELECT c.*, u.display_name as display_name 
+            SELECT c.*, u.display_name as display_name,
+            (SELECT COALESCE(SUM(vote_value), 0) FROM comment_votes WHERE comment_id = c.id) as vote_count,
+            (SELECT vote_value FROM comment_votes WHERE comment_id = c.id AND user_id = ?) as user_vote
             FROM comments c 
             JOIN users u ON c.user_id = u.id 
             WHERE c.pdf_id = ? 
             ORDER BY c.created_at DESC
-        `).all(pdfId);
+            LIMIT ? OFFSET ?
+        `).all(req.session.userId, pdfId, pagination.itemsPerPage, pagination.offset);
 
-        // Process comments (markdown + ownership)
+        // Process comments (markdown + ownership + vote status)
         const processedComments = comments.map(c => ({
             ...c,
             comment_text: marked.parse(c.comment_text),
             isOwner: c.user_id === req.session.userId,
             profile_color: '#6d28d9',
-            profile_icon: '👤'
+            profile_icon: '👤',
+            isUpvoted: c.user_vote === 1,
+            isDownvoted: c.user_vote === -1
         }));
 
         res.render('viewPdf', { 
             pdf, 
             comments: processedComments,
             isPdfOwner: pdf.user_id === req.session.userId,
-            pagination: { hasPrevious: false, hasNext: false } // TODO: Implement pagination
+            pagination
         });
     } catch (error) {
         console.error('Error viewing PDF:', error);
@@ -175,8 +199,18 @@ router.post('/comment/delete/:id', requireAuth, (req, res) => {
 router.get('/', requireAuth, (req, res) => {
     try {
         const userId = req.session.userId;
-        const pdfs = db.prepare('SELECT * FROM pdfs WHERE user_id = ? ORDER BY created_at DESC').all(userId);
-        res.render('viewPdfs', { pdfs });
+        const page = req.query.page || 1;
+        const limit = 6; // 6 items per page for grid view
+
+        const countStmt = db.prepare('SELECT COUNT(*) as count FROM pdfs WHERE user_id = ?');
+        const totalItems = countStmt.get(userId).count;
+
+        const pagination = getPagination(page, limit, totalItems);
+
+        const pdfs = db.prepare('SELECT * FROM pdfs WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?')
+            .all(userId, pagination.itemsPerPage, pagination.offset);
+
+        res.render('viewPdfs', { pdfs, pagination });
     } catch (error) {
         console.error('Error fetching PDFs:', error);
         res.render('error', { message: 'Error fetching PDFs.' });
@@ -193,13 +227,49 @@ router.post('/comment/edit/:id', requireAuth,  (req, res) => {
 
         const comment = db.prepare('SELECT * FROM comments WHERE id = ?').get(commentId);
         if (comment && comment.user_id === userId) {
-            db.prepare('UPDATE comments SET comment_text = ? WHERE id = ?').run(comment_text, commentId);
+            db.prepare('UPDATE comments SET comment_text = ?, is_edited = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(comment_text, commentId);
             res.redirect(`/pdfs/view/${comment.pdf_id}`);
         } else {
             res.status(403).send('Unauthorized');
         }
     } catch (error) {
         console.error('Error editing comment:', error);
+        res.redirect('back');
+    }
+});
+
+// Vote on Comment
+router.post('/comment/vote/:id/:type', requireAuth, (req, res) => {
+    try {
+        const commentId = req.params.id;
+        const type = req.params.type; // 'up' or 'down'
+        const userId = req.session.userId;
+        const voteValue = type === 'up' ? 1 : -1;
+
+        const comment = db.prepare('SELECT * FROM comments WHERE id = ?').get(commentId);
+        if (!comment) {
+            return res.status(404).send('Comment not found');
+        }
+
+        // Check if user already voted
+        const existingVote = db.prepare('SELECT * FROM comment_votes WHERE user_id = ? AND comment_id = ?').get(userId, commentId);
+
+        if (existingVote) {
+            if (existingVote.vote_value === voteValue) {
+                // Same vote: remove it (toggle off)
+                db.prepare('DELETE FROM comment_votes WHERE id = ?').run(existingVote.id);
+            } else {
+                // Different vote: update it
+                db.prepare('UPDATE comment_votes SET vote_value = ? WHERE id = ?').run(voteValue, existingVote.id);
+            }
+        } else {
+            // New vote
+            db.prepare('INSERT INTO comment_votes (user_id, comment_id, vote_value) VALUES (?, ?, ?)').run(userId, commentId, voteValue);
+        }
+
+        res.redirect(`/pdfs/view/${comment.pdf_id}`);
+    } catch (error) {
+        console.error('Error voting on comment:', error);
         res.redirect('back');
     }
 });
