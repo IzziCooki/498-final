@@ -81,6 +81,22 @@ docker compose up --build -d
 - **docker-compose.dev.yml**: Development overrides for Docker Compose.
 - **Makefile**: Shortcuts for common commands.
 
+## Comment features
+- Edit and delete comments you created on a pdf post (Show if you edited the comment, and when)
+- Upvote and downvote feature for pdf comments 
+
+## Authentication Features
+- Lock account after 5 failed login attempts. Unlock after 15 minutes.
+- Forgot password feature. (Send reset link to email)
+
+## Extra Feature
+
+- Shared PDFs Library
+  - Users can add their personal pdfs to the shared pdf library 
+
+
+
+
 ## License
 
 [ISC](https://opensource.org/licenses/ISC)

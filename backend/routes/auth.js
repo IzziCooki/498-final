@@ -149,6 +149,11 @@ router.post('/profile', (req, res) => {
 
     const { display_name, email, color } = req.body;
     const userId = req.session.userId;
+    // Make sure email not taken
+    const existingEmailUser = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, userId);
+    if (existingEmailUser) {
+        return res.redirect('/profile?error=Email is already in use by another account.');
+    }
 
     try {
         const stmt = db.prepare('UPDATE users SET display_name = ?, email = ?, color = ? WHERE id = ?');

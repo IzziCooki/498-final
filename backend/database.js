@@ -15,7 +15,7 @@ db.exec(`
     display_name TEXT,
     color TEXT DEFAULT "#6d28d9",
     display_icon TEXT DEFAULT "👤",
-    email TEXT,
+    email TEXT UNIQUE,
     reset_password_token TEXT,
     reset_password_expires DATETIME,
     password_hash TEXT NOT NULL,
