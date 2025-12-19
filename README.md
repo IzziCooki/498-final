@@ -1,97 +1,86 @@
-# DevOps PDF Library (Assignment 3)
+# PDF Manager (Final Project)
 
-This project is a web application for managing and viewing PDF files, developed as part of Assignment 3. It demonstrates the use of a Node.js backend with an SQLite database, containerized using Docker, and served behind an Nginx Proxy Manager.
+A comprehensive web application for managing, viewing, and discussing PDF documents. This project features a full-stack implementation with real-time chat capabilities, user authentication, and a robust PDF management system.
 
 ## Features
 
-- **PDF Management**: Upload and store PDF documents.
-- **PDF Viewing**: View the list of available PDFs and their details.
-- **PDF Processing**: Extracts information and generates images from PDFs using `pdf-parse` and `pdf-to-img`.
-- **Responsive UI**: Built with Handlebars (hbs) templates and custom CSS.
-- **Containerization**: Fully dockerized application using Docker Compose.
-- **Reverse Proxy**: Integrated Nginx Proxy Manager for handling traffic and SSL management.
+- **User Authentication**: Secure registration and login system using Argon2 hashing.
+- **PDF Management**: 
+  - Upload and store PDF documents.
+  - View PDFs directly in the browser.
+  - Manage your personal library.
+  - Access a shared library of PDFs.
+- **Interactive Features**:
+  - **Real-time Chat**: Global chat functionality powered by Socket.io.
+  - **Comments**: Add comments to PDFs, with support for editing and voting (upvotes/downvotes).
+- **User Profiles**: Customize your display name and profile color.
+- **Responsive Design**: Mobile-friendly interface with a collapsible navigation menu.
 
 ## Tech Stack
 
 - **Backend**: Node.js, Express.js
-- **Database**: SQLite3
-- **Templating Engine**: Handlebars (hbs)
+- **Database**: SQLite (using `better-sqlite3`)
+- **Templating**: Handlebars (`express-handlebars`)
+- **Real-time**: Socket.io
 - **Containerization**: Docker, Docker Compose
-- **Proxy**: Nginx Proxy Manager
+- **Reverse Proxy**: Nginx Proxy Manager
 
-## Project Structure
+## Prerequisites
 
-```
-.
-├── backend/                # Node.js application source code
-│   ├── db/                 # Database files
-│   ├── middleware/         # Express middleware (PDF verification, etc.)
-│   ├── pdfs/               # Storage for uploaded PDFs
-│   ├── public/             # Static assets (CSS, images)
-│   ├── routes/             # API routes
-│   ├── views/              # Handlebars templates
-│   ├── server.js           # Application entry point
-│   └── Dockerfile          # Docker configuration for the backend
-├── nginx/                  # Nginx Proxy Manager configuration and data
-│   ├── data/               # Persistent data for Nginx
-│   └── letsencrypt/        # SSL certificates
-├── docker-compose.yml      # Docker Compose configuration
-└── README.md               # Project documentation
-```
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Make](https://www.gnu.org/software/make/) (optional, for using the Makefile)
 
-## Getting Started
-
-### Prerequisites
-
-- Docker
-- Docker Compose
-
-### Installation & Running
-
-1.  **Clone the repository** (if applicable) or navigate to the project directory.
-
-2.  **Start the application** using Docker Compose:
-
-    ```bash
-    docker compose up -d
-    ```
-
-    This command will build the backend image and start both the `backend-pdf` and `nginx-pdf` containers.
-
-    Alternatively, you can use the provided Makefile for development with hot-reloading:
-
-    ```bash
-    make dev
-    ```
-
-3.  **Access the Application**:
-    - **Nginx Proxy Manager Admin Interface**: `http://localhost:5001`
-        - Default Email: `admin@example.com`
-        - Default Password: `changeme`
-    - **Web Application**: Accessible via the configured Nginx proxy hosts (e.g., `http://localhost` if configured to forward to `backend-pdf:1738`).
+## Installation & Running
 
 ### Development
 
-To run the backend locally without Docker for development:
+To run the application in development mode (with hot-reloading for the backend):
 
-1.  Navigate to the `backend` directory:
-    ```bash
-    cd backend
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Start the server:
-    ```bash
-    node server.js
-    ```
-    The server will start on port 1738 (default).
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd 498-final
+   ```
 
-## Assignment Details
+2. Start the services using Make:
+   ```bash
+   make dev
+   ```
+   
+   Or using Docker Compose directly:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+   ```
 
-This submission implements the requirements for Assignment 3, focusing on:
-- Containerizing a Node.js application.
-- Setting up Nginx Proxy Manager as a reverse proxy.
-- Configuring Docker Compose to orchestrate the services.
-- Ensuring data persistence for the database and Nginx configurations.
+3. Access the application at `http://localhost`.
+
+### Production
+
+To run the application in production mode:
+
+```bash
+make prod
+```
+
+Or:
+```bash
+docker compose up --build -d
+```
+
+## Project Structure
+
+- **backend/**: Contains the Node.js/Express application code.
+  - **routes/**: API and view routes.
+  - **views/**: Handlebars templates.
+  - **modules/**: Utility modules and middleware.
+  - **public/**: Static assets (CSS, client-side JS).
+  - **db/**: Database files.
+- **nginx/**: Nginx configuration and data.
+- **docker-compose.yml**: Base Docker Compose configuration.
+- **docker-compose.dev.yml**: Development overrides for Docker Compose.
+- **Makefile**: Shortcuts for common commands.
+
+## License
+
+[ISC](https://opensource.org/licenses/ISC)
