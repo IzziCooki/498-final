@@ -19,6 +19,8 @@ db.exec(`
     reset_password_token TEXT,
     reset_password_expires DATETIME,
     password_hash TEXT NOT NULL,
+    login_attempts INTEGER DEFAULT 0,
+    lock_until DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME
   )

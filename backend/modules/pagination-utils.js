@@ -17,7 +17,7 @@ function getPagination(page, limit, totalItems) {
         previousPage: currentPage - 1,
         nextPage: currentPage + 1,
         showPagination: totalPages > 1,
-        // Generate array of page numbers for simple rendering
+        // Generate array of page numbers for rendering
         pages: Array.from({ length: totalPages }, (_, i) => ({
             number: i + 1,
             active: i + 1 === currentPage

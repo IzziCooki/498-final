@@ -543,3 +543,5 @@
 [19/Dec/2025:18:59:53 +0000] 400 - GET http 74.179.86.179 "/api/mcp" [Client 52.241.7.61] [Length 252] [Gzip -] "mrtscan/1.0 (westus)" "-"
 [19/Dec/2025:18:59:53 +0000] 400 - GET http 74.179.86.179 "/v1/mcp" [Client 52.241.7.61] [Length 252] [Gzip -] "mrtscan/1.0 (westus)" "-"
 [19/Dec/2025:18:59:53 +0000] 400 - GET http 74.179.86.179 "/jsonrpc" [Client 52.241.7.61] [Length 252] [Gzip -] "mrtscan/1.0 (westus)" "-"
+[19/Dec/2025:20:23:08 +0000] 400 - GET http 74.179.86.179 "/aaa9" [Client 80.82.77.202] [Length 654] [Gzip -] "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36" "-"
+[19/Dec/2025:20:23:08 +0000] 400 - GET http 74.179.86.179 "/aab9" [Client 80.82.77.202] [Length 654] [Gzip -] "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36" "-"

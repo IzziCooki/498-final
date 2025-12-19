@@ -58,9 +58,26 @@ router.post('/login', async (req, res) => {
             return res.render('login', { error: 'Invalid username or password' });
         }
 
+        if (user.lock_until && user.lock_until > Date.now()) {
+            return res.render('login', { error: 'Account is temporarily locked due to multiple failed login attempts. Please try again later.' });
+        } else if (user.lock_until && user.lock_until <= Date.now()) {
+            // Unlock account
+            db.prepare('UPDATE users SET login_attempts = 0, lock_until = NULL WHERE id = ?').run(user.id);
+            user.login_attempts = 0;
+            user.lock_until = null;
+        }
+
+
         const passwordMatch = await comparePassword(password, user.password_hash);
 
         if (!passwordMatch) {
+            user.login_attempts += 1;
+            db.prepare('UPDATE users SET login_attempts = ? WHERE id = ?').run(user.login_attempts, user.id);
+            if (user.login_attempts >= 5) {
+                const lockUntil = Date.now() + 15 * 60 * 1000; // 15 minutes
+                db.prepare('UPDATE users SET lock_until = ? WHERE id = ?').run(lockUntil, user.id);
+                return res.render('login', { error: 'Account locked due to too many failed login attempts. Please try again later.' });
+            }
             return res.render('login', { error: 'Invalid username or password' });
         }
 
