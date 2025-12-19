@@ -95,8 +95,3 @@ docker compose up --build -d
   - Users can add their personal pdfs to the shared pdf library 
 
 
-
-
-## License
-
-[ISC](https://opensource.org/licenses/ISC)
