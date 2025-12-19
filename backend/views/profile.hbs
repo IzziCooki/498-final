@@ -24,8 +24,25 @@
             </div>
             <div class="form-group">
                 <label for="color">Color</label>
-                <input type="text" id="color" name="color" value="{{color}}" placeholder="{{color}}">
+                <select id="color" name="color">
+                    <option value="#6d28d9">Purple (Default)</option>
+                    <option value="#ef4444">Red</option>
+                    <option value="#3b82f6">Blue</option>
+                    <option value="#10b981">Green</option>
+                    <option value="#f59e0b">Orange</option>
+                    <option value="#6b7280">Gray</option>
+                    <option value="#ec4899">Pink</option>
+                </select>
             </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const colorSelect = document.getElementById('color');
+                    const currentColor = "{{color}}";
+                    if (currentColor) {
+                        colorSelect.value = currentColor;
+                    }
+                });
+            </script>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" value="{{email}}">
