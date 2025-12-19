@@ -82,7 +82,7 @@ router.get('/view/:id', requireAuth, (req, res) => {
 
         // Fetch comments
         const comments = db.prepare(`
-            SELECT c.*, u.username as display_name 
+            SELECT c.*, u.display_name as display_name 
             FROM comments c 
             JOIN users u ON c.user_id = u.id 
             WHERE c.pdf_id = ? 
