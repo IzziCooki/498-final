@@ -2,7 +2,13 @@
     <div class="nav-container container">
         <a href="/" class="logo">PDF Manager</a>
 
-        <nav class="nav-links">
+        <button class="mobile-menu-btn" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
             <a href="/">Home</a>
             {{#if user}}
                 <a href="/pdfs">Library</a>
@@ -15,7 +21,19 @@
                  <a href="/login">Login</a>
                  <a href="/register">Register</a>
             {{/if}}
-
         </nav>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (menuBtn && navLinks) {
+            menuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+        }
+    });
+</script>
